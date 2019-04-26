@@ -10,7 +10,7 @@
     "/lib"
   ],
   "scripts": {
-    "styles": "theme-builder",
+    "start": "cross-env BABEL_ENV=es webpack-dev-server",
     "build": "yarn build:cjs && yarn build:es && yarn build:css",
     "build:cjs": "cross-env BABEL_ENV=cjs babel src --out-dir lib --ignore \"src/**/__tests__\"",
     "build:es": "cross-env BABEL_ENV=es babel src --out-dir es --ignore \"src/**/__tests__\"",
@@ -46,7 +46,9 @@
     "@babel/preset-react": "^7.0.0",
     "autoprefixer": "^9.5.1",
     "babel-eslint": "^10.0.1",
+    "babel-loader": "^8.0.5",
     "cross-env": "^5.2.0",
+    "css-loader": "^2.1.1",
     "eslint": "^5.16.0",
     "eslint-config-airbnb": "^17.1.0",
     "eslint-plugin-import": "^2.17.2",
@@ -55,7 +57,11 @@
     "postcss-cli": "^6.1.2",
     "precss": "^4.0.0",
     "react": "^16.8.6",
-    "react-dom": "^16.8.6"
+    "react-dom": "^16.8.6",
+    "style-loader": "^0.23.1",
+    "webpack": "^4.30.0",
+    "webpack-cli": "^3.3.1",
+    "webpack-dev-server": "^3.3.1"
   },
   "peerDependencies": {
     "react": "^16.3.0",
