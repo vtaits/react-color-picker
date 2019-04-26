@@ -1,5 +1,22 @@
 {
   "env": {
+    "dev": {
+      "presets": [
+        [
+          "@babel/preset-env",
+
+          {
+            "modules": false,
+            "targets": {
+              "firefox": "66",
+              "chrome": "73"
+            }
+          }
+        ],
+        "@babel/preset-react"
+      ]
+    },
+
     "cjs": {
       "presets": [
         "@babel/preset-env",
