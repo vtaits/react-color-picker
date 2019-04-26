@@ -8,6 +8,7 @@ import BaseComponent, {
 import DEFAULT_COLOR from './defaultColor';
 
 import VALIDATE from './utils/validate';
+import toColorValue from './utils/toColorValue';
 
 class HueSpectrum extends BaseComponent {
   static propTypes = {
@@ -50,17 +51,20 @@ class HueSpectrum extends BaseComponent {
     }
   }
 
-  getDragPosition(hsv) {
-    const newHsv = hsv || this.hsv;
+  getDragPosition() {
+    const {
+      height,
+      pointerSize,
+    } = this.props;
 
-    if (!this.props.height && !this.isComponentMounted()) {
+    if (!height && !this.isComponentMounted()) {
       return null;
     }
 
-    const height = this.props.height || this.getDOMRegion().getHeight();
-    const size = this.props.pointerSize;
+    const computedHeight = height || this.getDOMRegion().getHeight();
+    const size = pointerSize;
 
-    const pos = Math.round(newHsv.h * height / 360);
+    const pos = Math.round(this.hsv.h * computedHeight / 360);
     const diff = Math.round(size / 2);
 
     return pos - diff;
@@ -71,11 +75,25 @@ class HueSpectrum extends BaseComponent {
 
     this.hsv.h = newPoint.y * 360 / newPoint.height;
 
+    const newHsv = {
+      ...this.hsv,
+    };
+
+    let newH;
+
     if (this.hsv.h !== 0) {
-      this.state.h = this.hsv.h;
+      newH = this.hsv.h;
     }
 
-    this.state.h = this.hsv.h !== 0 ? this.hsv.h : 0;
+    newH = this.hsv.h !== 0 ? this.hsv.h : 0;
+
+    this.setState({
+      h: newH,
+    });
+
+    this.hsv = newHsv;
+
+    return newHsv;
   }
 
   render() {
@@ -84,20 +102,24 @@ class HueSpectrum extends BaseComponent {
       value,
       defaultValue,
       defaultColor,
+      pointerSize,
+      height,
+      width,
     } = this.props;
 
     const {
       value: stateValue,
+      h,
     } = this.state;
 
-    this.hsv = this.toColorValue(
+    this.hsv = toColorValue(
       stateValue
       || value
       || defaultValue
       || defaultColor,
     );
 
-    if (this.state.h === 360 && !this.hsv.h) {
+    if (h === 360 && !this.hsv.h) {
       // in order to show bottom red as well on drag
       this.hsv.h = 360;
     }
@@ -106,15 +128,15 @@ class HueSpectrum extends BaseComponent {
       ...style,
     };
 
-    if (this.props.height) {
-      rootStyle.height = this.props.height;
+    if (height) {
+      rootStyle.height = height;
     }
-    if (this.props.width) {
-      rootStyle.width = this.props.width;
+    if (width) {
+      rootStyle.width = width;
     }
 
     const dragStyle = {
-      height: this.props.pointerSize,
+      height: pointerSize,
     };
 
     const dragPos = this.getDragPosition();

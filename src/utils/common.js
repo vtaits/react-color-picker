@@ -1,3 +1,5 @@
+
+/* eslint-disable react/no-unused-state */
 import { Component, createRef } from 'react';
 import PropTypes from 'prop-types';
 import Region from 'region';
@@ -6,6 +8,9 @@ import DragHelper from 'drag-helper';
 import toStringValue from './toStringValue';
 
 export const baseInitialState = {
+  top: 0,
+  left: 0,
+  mouseDown: null,
   value: null,
 };
 
@@ -26,6 +31,18 @@ export const baseDefaultProps = {
   onChange: null,
 };
 
+const getEventInfo = (event, region) => {
+  const x = event.clientX - region.left;
+  const y = event.clientY - region.top;
+
+  return {
+    x,
+    y,
+    width: region.getWidth(),
+    height: region.getHeight(),
+  };
+};
+
 class BaseComponent extends Component {
   static propTypes = basePropTypes;
 
@@ -41,45 +58,31 @@ class BaseComponent extends Component {
     return Region.fromDOM(this.rootRef.current);
   }
 
-  getColors() {
+  getColors(hsv) {
     const {
       inPicker,
     } = this.props;
 
     const first = inPicker
-      ? this.hsv
-      : toStringValue(this.hsv);
+      ? hsv
+      : toStringValue(hsv);
 
     const args = [first];
 
     if (!inPicker) {
       args.push({
-        ...this.hsv,
+        ...hsv,
       });
     }
 
     return args;
   }
 
-  getEventInfo(event, region) {
-    const newRegion = region || this.getDOMRegion();
-
-    const x = event.clientX - newRegion.left;
-    const y = event.clientY - newRegion.top;
-
-    return {
-      x,
-      y,
-      width: newRegion.getWidth(),
-      height: newRegion.getHeight(),
-    };
-  }
-
   onMouseDown = (event) => {
     event.preventDefault();
 
     const region = this.getDOMRegion();
-    const info = this.getEventInfo(event, region);
+    const info = getEventInfo(event, region);
 
     DragHelper(event, {
       scope: this,
@@ -97,15 +100,17 @@ class BaseComponent extends Component {
       /* eslint-enable no-param-reassign */
 
       onDrag(dragEvent, config) {
-        const dragInfo = this.getEventInfo(event, region);
-        this.updateColor(dragInfo);
-        this.handleDrag(dragEvent, config);
+        const dragInfo = getEventInfo(dragEvent, region);
+        const newHsv = this.updateColor(dragInfo);
+
+        this.handleDrag(dragEvent, config, newHsv);
       },
 
       onDrop(dropEvent, config) {
-        const dropInfo = this.getEventInfo(event, region);
-        this.updateColor(dropInfo);
-        this.handleDrop(dropEvent, config);
+        const dropInfo = getEventInfo(dropEvent, region);
+        const newHsv = this.updateColor(dropInfo);
+
+        this.handleDrop(dropEvent, config, newHsv);
       },
     });
 
@@ -119,10 +124,10 @@ class BaseComponent extends Component {
     } = this.props;
 
     if (onMouseDown) {
-      onMouseDown.apply(this, this.getColors());
+      onMouseDown.apply(this, this.getColors(this.hsv));
     }
 
-    this.handleDrag(event, config);
+    this.handleDrag(event, config, this.hsv);
   }
 
   handleUpdate = (event, config) => {
@@ -143,15 +148,16 @@ class BaseComponent extends Component {
       left = Math.max(left, config.minLeft);
       left = Math.min(left, config.maxLeft);
 
-      this.state.top = top;
-      this.state.left = left;
-
-      this.state.mouseDown = {
-        x: left,
-        y: top,
-        width: initialPoint.width,
-        height: initialPoint.height,
-      };
+      this.setState({
+        top,
+        left,
+        mouseDown: {
+          x: left,
+          y: top,
+          width: initialPoint.width,
+          height: initialPoint.height,
+        },
+      });
     }
 
     if (inPicker) {
@@ -167,49 +173,7 @@ class BaseComponent extends Component {
     }
   }
 
-  handleUpdate = (event, config) => {
-    const {
-      inPicker,
-      value,
-    } = this.props;
-
-    const diff = config.diff || { top: 0, left: 0 };
-    const { initialPoint } = config;
-
-    if (initialPoint) {
-      let left;
-
-      left = initialPoint.x + diff.left;
-      const top = initialPoint.y + diff.top;
-
-      left = Math.max(left, config.minLeft);
-      left = Math.min(left, config.maxLeft);
-
-      this.state.top = top;
-      this.state.left = left;
-
-      this.state.mouseDown = {
-        x: left,
-        y: top,
-        width: initialPoint.width,
-        height: initialPoint.height,
-      };
-    }
-
-    if (inPicker) {
-      // the picker handles the values
-      return;
-    }
-
-    if (!value) {
-      this.setState({
-        // eslint-disable-next-line react/no-unused-state
-        value: this.hsv,
-      });
-    }
-  }
-
-  handleDrag = (event, config) => {
+  handleDrag(event, config, hsv) {
     const {
       onDrag,
     } = this.props;
@@ -217,20 +181,23 @@ class BaseComponent extends Component {
     this.handleUpdate(event, config);
 
     if (onDrag) {
-      onDrag.apply(this, this.getColors());
+      onDrag.apply(this, this.getColors(hsv));
     }
   }
 
-  handleDrop = (event, config) => {
+  handleDrop(event, config, hsv) {
     const {
       onChange,
     } = this.props;
 
     this.handleUpdate(event, config);
-    this.state.mouseDown = false;
+
+    this.setState({
+      mouseDown: false,
+    });
 
     if (onChange) {
-      onChange.apply(this, this.getColors());
+      onChange.apply(this, this.getColors(hsv));
     }
   }
 }

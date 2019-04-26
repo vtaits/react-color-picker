@@ -72,10 +72,19 @@ class SaturationSpectrum extends BaseComponent {
     }
   }
 
-  getDragPosition(hsv) {
-    const newHsv = hsv || this.hsv;
+  getDragPosition() {
+    const {
+      value,
+      pointerSize,
+    } = this.props;
+    let {
+      width,
+      height,
+    } = this.props;
+    const {
+      mouseDown,
+    } = this.state;
 
-    let { width, height } = this.props;
     const sizeDefined = width && height;
 
     if (!sizeDefined && !this.isComponentMounted()) {
@@ -90,20 +99,17 @@ class SaturationSpectrum extends BaseComponent {
       width = width || region.getWidth();
     }
 
-    let x = newHsv.s * width;
-    const y = height - (newHsv.v * height);
-    const size = this.props.pointerSize;
+    let x = this.hsv.s * width;
+    const y = height - (this.hsv.v * height);
+
+    const size = pointerSize;
     const diff = Math.floor(size / 2);
 
     if (
-      this.props.value
-      && this.state.mouseDown
-      && !Number.isNaN(this.state.mouseDown.x)
+      value
+      && mouseDown
+      && !Number.isNaN(mouseDown.x)
     ) {
-      const {
-        mouseDown,
-      } = this.state;
-
       ({ x } = mouseDown);
     }
 
@@ -152,11 +158,14 @@ class SaturationSpectrum extends BaseComponent {
   }
 
   render() {
+    const {
+      pointerSize,
+    } = this.props;
     const props = this.prepareProps(this.props, this.state);
 
     const dragStyle = {
-      width: this.props.pointerSize,
-      height: this.props.pointerSize,
+      width: pointerSize,
+      height: pointerSize,
     };
 
     const dragPos = this.getDragPosition();
@@ -191,6 +200,14 @@ class SaturationSpectrum extends BaseComponent {
 
     this.hsv.s = getSaturationForPoint(newPoint);
     this.hsv.v = getColorValueForPoint(newPoint);
+
+    const newHsv = {
+      ...this.hsv,
+    };
+
+    this.hsv = newHsv;
+
+    return newHsv;
   }
 }
 
