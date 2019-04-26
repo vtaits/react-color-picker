@@ -1,3 +1,5 @@
+[![NPM](https://img.shields.io/npm/v/@vtaits/react-color-picker.svg)](https://www.npmjs.com/package/@vtaits/react-color-picker)
+
 # React Color Picker
 
 > This is a resurrection of package [react-color-picker](https://www.npmjs.com/package/react-color-picker).
