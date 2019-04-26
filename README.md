@@ -35,9 +35,9 @@ Example (**controlled**)
 ```jsx
 import { render } from 'react-dom';
 import React, { useState } from 'react';
-import ColorPicker from 'react-color-picker';
+import ColorPicker from '@vtaits/react-color-picker';
 
-import 'react-color-picker/dist/index.css';
+import '@vtaits/react-color-picker/dist/index.css';
 
 const App = () => {
   const [color, setColor] = useState('red');
@@ -79,7 +79,7 @@ You can use only the hue spectrum if that is what you need.
 
 ```jsx
 import React from 'react';
-import { HueSpectrum } from 'react-color-picker';
+import { HueSpectrum } from '@vtaits/react-color-picker';
 
 <HueSpectrum value={color} width={100}/>
 <HueSpectrum defaultValue="red" />
@@ -91,7 +91,7 @@ You can use only the saturation spectrum if that is what you need.
 
 ```jsx
 import React from 'react';
-import { SaturationSpectrum } from 'react-color-picker';
+import { SaturationSpectrum } from '@vtaits/react-color-picker';
 
 <SaturationSpectrum value={color} height={400}/>
 <SaturationSpectrum defaultValue="red" />
