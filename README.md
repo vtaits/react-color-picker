@@ -28,12 +28,8 @@ $ npm install @vtaits/react-color-picker
 $ yarn add @vtaits/react-color-picker
 ```
 
-## Usage
-You can have either **controlled** (using **value**) or **uncontrolled** (using **defaultValue**) pickers.
-
 #### Please don't forget to include the styles!!! - `index.css`
 
-Example (**controlled**)
 ```jsx
 import { render } from 'react-dom';
 import React, { useState } from 'react';
@@ -67,14 +63,6 @@ const App = () => {
 render(<App />, document.getElementById('content'))
 ```
 
-Example (**uncontrolled**)
-```jsx
-render(
-  <ColorPicker defaultValue='#452135'/>,
-  document.getElementById('content')
-)
-
-```
 ## HueSpectrum
 
 You can use only the hue spectrum if that is what you need.
@@ -84,7 +72,6 @@ import React from 'react';
 import { HueSpectrum } from '@vtaits/react-color-picker';
 
 <HueSpectrum value={color} width={100}/>
-<HueSpectrum defaultValue="red" />
 ```
 
 ## SaturationSpectrum
@@ -96,7 +83,6 @@ import React from 'react';
 import { SaturationSpectrum } from '@vtaits/react-color-picker';
 
 <SaturationSpectrum value={color} height={400}/>
-<SaturationSpectrum defaultValue="red" />
 ```
 
 ## Properties

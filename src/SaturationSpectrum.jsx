@@ -34,6 +34,7 @@ class SaturationSpectrum extends BaseComponent {
   static propTypes = {
     ...basePropTypes,
 
+    value: PropTypes.any,
     height: PropTypes.number,
     width: PropTypes.number,
     pointerSize: PropTypes.number,
@@ -44,6 +45,7 @@ class SaturationSpectrum extends BaseComponent {
   static defaultProps = {
     ...baseDefaultProps,
 
+    value: null,
     height: 300,
     width: 300,
     pointerSize: 7,
@@ -119,12 +121,12 @@ class SaturationSpectrum extends BaseComponent {
     };
   }
 
-  prepareProps(thisProps, state) {
+  prepareProps(thisProps) {
     const props = {
       ...thisProps,
     };
 
-    const color = state.value || props.value || props.defaultValue || props.defaultColor;
+    const color = props.value || props.defaultColor;
 
     props.color = color;
 
@@ -161,7 +163,7 @@ class SaturationSpectrum extends BaseComponent {
     const {
       pointerSize,
     } = this.props;
-    const props = this.prepareProps(this.props, this.state);
+    const props = this.prepareProps(this.props);
 
     const dragStyle = {
       width: pointerSize,

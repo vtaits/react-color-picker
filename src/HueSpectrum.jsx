@@ -14,6 +14,7 @@ class HueSpectrum extends BaseComponent {
   static propTypes = {
     ...basePropTypes,
 
+    value: PropTypes.any,
     height: PropTypes.number,
     width: PropTypes.number,
     pointerSize: PropTypes.number,
@@ -24,6 +25,7 @@ class HueSpectrum extends BaseComponent {
   static defaultProps = {
     ...baseDefaultProps,
 
+    value: null,
     height: 300,
     width: 30,
     pointerSize: 3,
@@ -100,7 +102,6 @@ class HueSpectrum extends BaseComponent {
     const {
       style,
       value,
-      defaultValue,
       defaultColor,
       pointerSize,
       height,
@@ -108,16 +109,10 @@ class HueSpectrum extends BaseComponent {
     } = this.props;
 
     const {
-      value: stateValue,
       h,
     } = this.state;
 
-    this.hsv = toColorValue(
-      stateValue
-      || value
-      || defaultValue
-      || defaultColor,
-    );
+    this.hsv = toColorValue(value || defaultColor);
 
     if (h === 360 && !this.hsv.h) {
       // in order to show bottom red as well on drag

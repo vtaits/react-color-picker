@@ -16,7 +16,6 @@ class ColorPicker extends Component {
     onChange: PropTypes.func,
 
     value: PropTypes.any,
-    defaultValue: PropTypes.any,
     defaultColor: PropTypes.any,
 
     hueHeight: PropTypes.number,
@@ -32,7 +31,6 @@ class ColorPicker extends Component {
     onChange: Function.prototype,
 
     value: null,
-    defaultValue: null,
     defaultColor: DEFAULT_COLOR,
 
     hueHeight: null,
@@ -43,16 +41,8 @@ class ColorPicker extends Component {
     saturationHeight: 300,
   };
 
-  constructor(props) {
-    super(props);
-
-    const {
-      defaultValue,
-    } = props;
-
-    this.state = {
-      value: defaultValue,
-    };
+  state = {
+    dragHue: null,
   }
 
   handleSaturationChange = (color) => {
@@ -89,15 +79,8 @@ class ColorPicker extends Component {
 
   handleDrag(color) {
     const {
-      value,
       onDrag,
     } = this.props;
-
-    if (!value) {
-      this.setState({
-        value: color,
-      });
-    }
 
     onDrag(toStringValue(color), color);
   }
@@ -129,7 +112,6 @@ class ColorPicker extends Component {
       hueHeight,
       hueMargin,
       hueWidth,
-      defaultValue: propsDefaultValue,
       defaultColor,
       value: propsValue,
       saturationHeight,
@@ -138,7 +120,6 @@ class ColorPicker extends Component {
     } = props;
 
     const {
-      value: stateValue,
       dragHue,
     } = this.state;
 
@@ -148,13 +129,7 @@ class ColorPicker extends Component {
       marginLeft: hueMargin,
     };
 
-    const value = props.value
-      ? toColorValue(propsValue)
-      : null;
-
-    const defaultValue = !value
-      ? toColorValue(stateValue || propsDefaultValue || defaultColor)
-      : null;
+    const value = toColorValue(propsValue || defaultColor);
 
     let { children } = props;
     let hueSpectrumProps = null;
@@ -210,25 +185,15 @@ class ColorPicker extends Component {
     hueConfig.inPicker = true;
 
     if (dragHue) {
-      (value || defaultValue).h = dragHue;
+      value.h = dragHue;
     }
 
-    // both value and defaultValue are objects like: {h,s,v}
-    if (value) {
-      saturationConfig.value = {
-        ...value,
-      };
-      hueConfig.value = {
-        ...value,
-      };
-    } else {
-      saturationConfig.defaultValue = {
-        ...defaultValue,
-      };
-      hueConfig.defaultValue = {
-        ...defaultValue,
-      };
-    }
+    saturationConfig.value = {
+      ...value,
+    };
+    hueConfig.value = {
+      ...value,
+    };
 
     return (
       <div

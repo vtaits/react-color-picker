@@ -11,12 +11,10 @@ export const baseInitialState = {
   top: 0,
   left: 0,
   mouseDown: null,
-  value: null,
 };
 
 export const basePropTypes = {
   inPicker: PropTypes.bool,
-  value: PropTypes.any,
   onMouseDown: PropTypes.func,
   onDrag: PropTypes.func,
   onChange: PropTypes.func,
@@ -25,7 +23,6 @@ export const basePropTypes = {
 
 export const baseDefaultProps = {
   inPicker: false,
-  value: null,
   onMouseDown: null,
   onDrag: null,
   onChange: null,
@@ -130,12 +127,7 @@ class BaseComponent extends Component {
     this.handleDrag(event, config, this.hsv);
   }
 
-  handleUpdate = (event, config) => {
-    const {
-      inPicker,
-      value,
-    } = this.props;
-
+  handleUpdate(event, config) {
     const diff = config.diff || { top: 0, left: 0 };
     const { initialPoint } = config;
 
@@ -157,18 +149,6 @@ class BaseComponent extends Component {
           width: initialPoint.width,
           height: initialPoint.height,
         },
-      });
-    }
-
-    if (inPicker) {
-      // the picker handles the values
-      return;
-    }
-
-    if (!value) {
-      this.setState({
-        // eslint-disable-next-line react/no-unused-state
-        value: this.hsv,
       });
     }
   }
