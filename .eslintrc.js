@@ -3,8 +3,18 @@ module.exports = {
     browser: true,
     es6: true,
   },
-  extends: ['eslint:recommended', 'airbnb'],
-  parser: 'babel-eslint',
+  extends: [
+    'eslint:recommended',
+    'airbnb',
+    'plugin:react/recommended',
+  ],
+  parser: '@babel/eslint-parser',
+
+  settings: {
+    react: {
+      version: 'detect',
+    },
+  },
 
   plugins: [
     'react',

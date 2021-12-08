@@ -1,5 +1,4 @@
-
-/* eslint-disable react/no-unused-state */
+/* eslint-disable */
 import { Component, createRef } from 'react';
 import PropTypes from 'prop-types';
 import Region from 'region';
@@ -19,7 +18,6 @@ export const basePropTypes = {
   onDrag: PropTypes.func,
   onChange: PropTypes.func,
 };
-
 
 export const baseDefaultProps = {
   inPicker: false,
