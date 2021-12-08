@@ -1,6 +1,6 @@
 {
   "name": "@vtaits/react-color-picker",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "React Color Picker",
   "main": "lib/index.js",
   "module": "es/index.js",
