@@ -20,7 +20,7 @@ class HueSpectrum extends BaseComponent {
     pointerSize: PropTypes.number,
     defaultColor: PropTypes.any,
     isHueSpectrum: PropTypes.bool,
-  }
+  };
 
   static defaultProps = {
     ...baseDefaultProps,
@@ -31,12 +31,12 @@ class HueSpectrum extends BaseComponent {
     pointerSize: 3,
     defaultColor: DEFAULT_COLOR,
     isHueSpectrum: true,
-  }
+  };
 
   state = {
     ...baseInitialState,
     h: 0,
-  }
+  };
 
   isComponentMounted() {
     return this.mounted;
@@ -66,7 +66,7 @@ class HueSpectrum extends BaseComponent {
     const computedHeight = height || this.getDOMRegion().getHeight();
     const size = pointerSize;
 
-    const pos = Math.round(this.hsv.h * computedHeight / 360);
+    const pos = Math.round((this.hsv.h * computedHeight) / 360);
     const diff = Math.round(size / 2);
 
     return pos - diff;
@@ -75,7 +75,7 @@ class HueSpectrum extends BaseComponent {
   updateColor(point) {
     const newPoint = VALIDATE(point);
 
-    this.hsv.h = newPoint.y * 360 / newPoint.height;
+    this.hsv.h = (newPoint.y * 360) / newPoint.height;
 
     const newHsv = {
       ...this.hsv,

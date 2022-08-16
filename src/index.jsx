@@ -11,7 +11,11 @@ import toStringValue from './utils/toStringValue';
 import DEFAULT_COLOR from './defaultColor';
 
 class ColorPicker extends Component {
+  // eslint-disable-next-line react/static-property-placement
   static propTypes = {
+    className: PropTypes.string,
+    hueStyle: PropTypes.objectOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number])),
+
     onDrag: PropTypes.func,
     onChange: PropTypes.func,
 
@@ -24,9 +28,15 @@ class ColorPicker extends Component {
 
     saturationWidth: PropTypes.number,
     saturationHeight: PropTypes.number,
-  }
 
+    children: PropTypes.node,
+  };
+
+  // eslint-disable-next-line react/static-property-placement
   static defaultProps = {
+    className: '',
+    hueStyle: {},
+
     onDrag: Function.prototype,
     onChange: Function.prototype,
 
@@ -39,19 +49,25 @@ class ColorPicker extends Component {
 
     saturationWidth: 300,
     saturationHeight: 300,
+
+    children: null,
   };
 
-  state = {
-    dragHue: null,
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      dragHue: null,
+    };
   }
 
   handleSaturationChange = (color) => {
     this.handleChange(color);
-  }
+  };
 
   handleHueChange = (color) => {
     this.handleChange(color);
-  }
+  };
 
   handleHueDrag = (hsv) => {
     this.setState({
@@ -59,23 +75,23 @@ class ColorPicker extends Component {
     });
 
     this.handleDrag(hsv);
-  }
+  };
 
   handleSaturationDrag = (hsv) => {
     this.handleDrag(hsv);
-  }
+  };
 
   handleHueMouseDown = (hsv) => {
     this.setState({
       dragHue: hsv.h,
     });
-  }
+  };
 
   handleSaturationMouseDown = (hsv) => {
     this.setState({
       dragHue: hsv.h,
     });
-  }
+  };
 
   handleDrag(color) {
     const {
@@ -106,7 +122,6 @@ class ColorPicker extends Component {
   render() {
     const { props } = this;
     const {
-      color,
       className: propsClassName,
       hueStyle: propsHueStyle,
       hueHeight,

@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 import PropTypes from 'prop-types';
 import cx from 'classnames';
@@ -40,7 +38,7 @@ class SaturationSpectrum extends BaseComponent {
     pointerSize: PropTypes.number,
     defaultColor: PropTypes.any,
     isSaturationSpectrum: PropTypes.bool,
-  }
+  };
 
   static defaultProps = {
     ...baseDefaultProps,
@@ -51,13 +49,13 @@ class SaturationSpectrum extends BaseComponent {
     pointerSize: 7,
     defaultColor: DEFAULT_COLOR,
     isSaturationSpectrum: true,
-  }
+  };
 
   state = {
     ...baseInitialState,
     pointerTop: null,
     pointerLeft: null,
-  }
+  };
 
   componentDidMount() {
     this.mounted = true;

@@ -1,41 +1,38 @@
-import React, { Component } from 'react';
+import React, {
+  useCallback,
+  useState,
+} from 'react';
+
 import ColorPicker from '@vtaits/react-color-picker';
 
 const COLOR = 'red';
 
-class App extends Component {
-  state = {
-    color: COLOR,
-  };
+export function App() {
+  const [color, setColor] = useState(COLOR);
 
-  onDrag = (color) => {
-    this.setState({
-      color,
-    });
-  };
+  const onDrag = useCallback((nextColor) => {
+    setColor(nextColor);
+  }, []);
 
-  render() {
-    const { color } = this.state;
+  return (
+    <div>
+      <h1>React Color Picker</h1>
 
-    return (
-      <div>
-        <h1>React Color Picker</h1>
+      <ColorPicker
+        value={color}
+        onDrag={onDrag}
+      />
 
-        <ColorPicker value={color} onDrag={this.onDrag} />
-
-        <div
-          style={{
-            background: color,
-            width: 100,
-            height: 50,
-            color: 'white',
-          }}
-        >
-          {color}
-        </div>
+      <div
+        style={{
+          background: color,
+          width: 100,
+          height: 50,
+          color: 'white',
+        }}
+      >
+        {color}
       </div>
-    );
-  }
+    </div>
+  );
 }
-
-export default App;
