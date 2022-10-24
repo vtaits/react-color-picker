@@ -5,7 +5,7 @@ import BaseComponent, {
   basePropTypes,
   baseDefaultProps,
 } from './utils/common';
-import DEFAULT_COLOR from './defaultColor';
+import { DEFAULT_COLOR } from './defaultColor';
 
 import VALIDATE from './utils/validate';
 import toColorValue from './utils/toColorValue';

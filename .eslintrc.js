@@ -6,7 +6,9 @@ module.exports = {
   extends: [
     'eslint:recommended',
     'airbnb',
-    'plugin:react/recommended',
+    'airbnb-typescript',
+    'plugin:@typescript-eslint/eslint-recommended',
+    'plugin:@typescript-eslint/recommended',
   ],
   parser: '@babel/eslint-parser',
 
@@ -18,6 +20,7 @@ module.exports = {
 
   plugins: [
     'react',
+    '@typescript-eslint',
   ],
 
   rules: {

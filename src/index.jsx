@@ -8,7 +8,7 @@ import SaturationSpectrum from './SaturationSpectrum';
 import toColorValue from './utils/toColorValue';
 import toStringValue from './utils/toStringValue';
 
-import DEFAULT_COLOR from './defaultColor';
+import { DEFAULT_COLOR } from './defaultColor';
 
 class ColorPicker extends Component {
   // eslint-disable-next-line react/static-property-placement

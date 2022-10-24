@@ -6,10 +6,28 @@ import DragHelper from 'drag-helper';
 
 import toStringValue from './toStringValue';
 
+type StateType = {
+  top: 0,
+  left: 0,
+  mouseDown: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  } | null;
+};
+
 export const baseInitialState = {
   top: 0,
   left: 0,
   mouseDown: null,
+};
+
+export type BaseProps = {
+  inPicker?: boolean;
+  onMouseDown?: Function;
+  onDrag?: Function;
+  onChange?: Function;
 };
 
 export const basePropTypes = {
@@ -26,7 +44,7 @@ export const baseDefaultProps = {
   onChange: null,
 };
 
-const getEventInfo = (event, region) => {
+const getEventInfo = (event: MouseEvent, region) => {
   const x = event.clientX - region.left;
   const y = event.clientY - region.top;
 
@@ -38,16 +56,12 @@ const getEventInfo = (event, region) => {
   };
 };
 
-class BaseComponent extends Component {
-  static propTypes = basePropTypes;
-
+class BaseComponent extends Component<BaseProps, StateType> {
   static defaultProps = baseDefaultProps;
 
   state = baseInitialState;
 
-  rootRef = createRef();
-
-  handleDragStart = Function.prototype;
+  rootRef = createRef<HTMLDivElement>();
 
   getDOMRegion() {
     return Region.fromDOM(this.rootRef.current);
@@ -89,8 +103,6 @@ class BaseComponent extends Component {
 
         config.minLeft = 0;
         config.maxLeft = region.width;
-
-        this.handleDragStart(dragStartEvent);
       },
       /* eslint-enable no-param-reassign */
 

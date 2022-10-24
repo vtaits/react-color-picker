@@ -8,19 +8,31 @@
           {
             "modules": false,
             "targets": {
-              "firefox": "66",
-              "chrome": "73"
+              "firefox": "103",
+              "chrome": "104"
             }
           }
         ],
-        "@babel/preset-react"
+        [
+          "@babel/preset-react",
+          {
+            "runtime": "automatic"
+          }
+        ],
+        "@babel/preset-typescript"
       ]
     },
 
     "cjs": {
       "presets": [
         "@babel/preset-env",
-        "@babel/preset-react"
+        [
+          "@babel/preset-react",
+          {
+            "runtime": "automatic"
+          }
+        ],
+        "@babel/preset-typescript"
       ]
     },
 
@@ -32,14 +44,21 @@
             "modules": false
           }
         ],
-        "@babel/preset-react"
+        [
+          "@babel/preset-react",
+          {
+            "runtime": "automatic"
+          }
+        ],
+        "@babel/preset-typescript"
       ]
     },
 
     "test": {
       "presets": [
         "@babel/preset-env",
-        "@babel/preset-react"
+        "@babel/preset-react",
+        "@babel/preset-typescript"
       ]
     }
   },
