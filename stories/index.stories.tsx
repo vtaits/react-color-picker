@@ -1,0 +1,20 @@
+import type { Meta, StoryObj } from '@storybook/react';
+
+import { ColorPicker, type ColorPickerProps } from '../src';
+
+import { Example } from './Example';
+
+const meta: Meta<typeof ColorPicker> = {
+  title: 'ColorPicker',
+  component: ColorPicker,
+  tags: ['autodocs'],
+};
+
+export default meta;
+type Story = StoryObj<typeof ColorPicker>;
+
+export const ExampleStory: Story = {
+  name: 'Example',
+  args: {},
+  render: (props) => <Example {...props} />,
+};
