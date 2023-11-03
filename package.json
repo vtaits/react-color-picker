@@ -1,6 +1,6 @@
 {
   "name": "@vtaits/react-color-picker",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "React Color Picker",
   "files": [
     "dist"
