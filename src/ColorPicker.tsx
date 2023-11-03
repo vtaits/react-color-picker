@@ -1,14 +1,22 @@
-import { type CSSProperties, Component, type PropsWithChildren } from "react";
 import cx from "classnames";
+import {
+	type CSSProperties,
+	Children,
+	Component,
+	type PropsWithChildren,
+	type ReactElement,
+} from "react";
 import type { ColorFormats, ColorInput } from "tinycolor2";
 
-import { HueSpectrum } from "./HueSpectrum";
-import { SaturationSpectrum } from "./SaturationSpectrum";
-
+import { HueSpectrum, type HueSpectrumProps } from "./HueSpectrum";
+import {
+	SaturationSpectrum,
+	type SaturationSpectrumProps,
+} from "./SaturationSpectrum";
+import { DEFAULT_COLOR } from "./defaultColor";
+import type { BaseProps } from "./utils/common";
 import { toColorValue } from "./utils/toColorValue";
 import { toStringValue } from "./utils/toStringValue";
-
-import { DEFAULT_COLOR } from "./defaultColor";
 
 export type ColorPickerProps = PropsWithChildren<{
 	className?: string;
@@ -28,7 +36,11 @@ export type ColorPickerProps = PropsWithChildren<{
 	saturationHeight?: number;
 }>;
 
-export class ColorPicker extends Component<ColorPickerProps> {
+type StateType = {
+	dragHue: number | null;
+};
+
+export class ColorPicker extends Component<ColorPickerProps, StateType> {
 	// eslint-disable-next-line react/static-property-placement
 	static defaultProps = {
 		className: "",
@@ -66,7 +78,11 @@ export class ColorPicker extends Component<ColorPickerProps> {
 		this.handleChange(color);
 	};
 
-	handleHueDrag = (hsv: ColorFormats.HSVA) => {
+	handleHueDrag = (hsv: string | ColorFormats.HSVA) => {
+		if (typeof hsv === "string") {
+			throw new Error("color cannot be string");
+		}
+
 		this.setState({
 			dragHue: hsv.h,
 		});
@@ -78,13 +94,21 @@ export class ColorPicker extends Component<ColorPickerProps> {
 		this.handleDrag(hsv);
 	};
 
-	handleHueMouseDown = (hsv: ColorFormats.HSVA) => {
+	handleHueMouseDown = (hsv: string | ColorFormats.HSVA) => {
+		if (typeof hsv === "string") {
+			throw new Error("color cannot be string");
+		}
+
 		this.setState({
 			dragHue: hsv.h,
 		});
 	};
 
-	handleSaturationMouseDown = (hsv: ColorFormats.HSVA) => {
+	handleSaturationMouseDown = (hsv: string | ColorFormats.HSVA) => {
+		if (typeof hsv === "string") {
+			throw new Error("color cannot be string");
+		}
+
 		this.setState({
 			dragHue: hsv.h,
 		});
@@ -136,6 +160,8 @@ export class ColorPicker extends Component<ColorPickerProps> {
 			value: propsValue,
 			saturationHeight,
 			saturationWidth,
+			onChange,
+			onDrag,
 			...divProps
 		} = props;
 
@@ -149,29 +175,34 @@ export class ColorPicker extends Component<ColorPickerProps> {
 
 		const value = toColorValue(propsValue || defaultColor || DEFAULT_COLOR);
 
-		let { children } = props;
-		let hueSpectrumProps = null;
-		let saturationSpectrumProps = null;
+		const { children } = props;
+		let hueSpectrumProps: BaseProps & HueSpectrumProps = {};
+		let saturationSpectrumProps: BaseProps & SaturationSpectrumProps = {};
 
 		if (children) {
-			children = React.Children.toArray(children).forEach((child) => {
-				if (child && child.props) {
-					if (child.props.isHueSpectrum) {
-						hueSpectrumProps = {
-							...child.props,
-						};
-					}
-
-					if (child.props.isSaturationSpectrum) {
-						saturationSpectrumProps = {
-							...child.props,
-						};
-					}
+			for (const child of Children.toArray(children)) {
+				if (!child || !(child as ReactElement).type) {
+					continue;
 				}
-			});
+
+				const childElement = child as ReactElement;
+
+				switch (childElement.type) {
+					case SaturationSpectrum:
+						saturationSpectrumProps = childElement.props;
+						break;
+
+					case HueSpectrum:
+						hueSpectrumProps = childElement.props;
+						break;
+
+					default:
+						break;
+				}
+			}
 		}
 
-		const saturationConfig = {
+		const saturationConfig: BaseProps & SaturationSpectrumProps = {
 			onDrag: this.handleSaturationDrag,
 			onChange: this.handleSaturationChange,
 			onMouseDown: this.handleSaturationMouseDown,
@@ -186,7 +217,7 @@ export class ColorPicker extends Component<ColorPickerProps> {
 		}
 		saturationConfig.inPicker = true;
 
-		const hueConfig = {
+		const hueConfig: BaseProps & HueSpectrumProps = {
 			onDrag: this.handleHueDrag,
 			onChange: this.handleHueChange,
 			onMouseDown: this.handleHueMouseDown,

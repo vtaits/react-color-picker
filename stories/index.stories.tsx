@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import { ColorPicker, type ColorPickerProps } from '../src';
+import { ColorPicker } from '../src';
+import '../dist/index.css';
 
 import { Example } from './Example';
 

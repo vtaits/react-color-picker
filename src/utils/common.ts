@@ -1,47 +1,34 @@
 /* eslint-disable */
-import { Component, type MouseEvent, createRef } from "react";
+import {
+	Component,
+	type MouseEvent as ReactMouseEvent,
+	createRef,
+} from "react";
 import type { ColorFormats, ColorInput } from "tinycolor2";
-import Region from "region";
-import DragHelper from "drag-helper";
 
+import type { ConfigType, PointType } from "../types";
 import { toStringValue } from "./toStringValue";
 
 type StateType = {
+	dragHue?: number;
+	h?: number;
 	top: number;
 	left: number;
-	mouseDown: {
-		x: number;
-		y: number;
-		width: number;
-		height: number;
-	} | null;
+	mouseDown: PointType | null;
+	pointerTop?: number;
+	pointerLeft?: number;
 };
 
-export const baseInitialState = {
+export const baseInitialState: StateType = {
 	top: 0,
 	left: 0,
 	mouseDown: null,
 };
 
-type ConfigType = {
-	diff?: {
-		top: number;
-		left: number;
-	};
-	initialPoint?: {
-		x: number;
-		y: number;
-		width: number;
-		height: number;
-	};
-	minLeft: number;
-	maxLeft: number;
-};
-
 export type BaseProps = {
 	inPicker?: boolean;
-	onMouseDown?: (...colors: readonly ColorInput[]) => void;
-	onDrag?: (...colors: readonly ColorInput[]) => void;
+	onMouseDown?: (...colors: readonly (string | ColorFormats.HSVA)[]) => void;
+	onDrag?: (...colors: readonly (string | ColorFormats.HSVA)[]) => void;
 	onChange?: (...colors: readonly ColorInput[]) => void;
 };
 
@@ -52,17 +39,20 @@ export const baseDefaultProps = {
 	onChange: undefined,
 };
 
-const getEventInfo = (event: MouseEvent, region) => {
-	const x = event.clientX - region.left;
-	const y = event.clientY - region.top;
+function getEventInfo(
+	[clientX, clientY]: [number, number],
+	region: DOMRect,
+): PointType {
+	const x = clientX - region.left;
+	const y = clientY - region.top;
 
 	return {
 		x,
 		y,
-		width: region.getWidth(),
-		height: region.getHeight(),
+		width: region.width,
+		height: region.height,
 	};
-};
+}
 
 export class BaseComponent<AdditionalProps> extends Component<
 	BaseProps & AdditionalProps,
@@ -76,20 +66,21 @@ export class BaseComponent<AdditionalProps> extends Component<
 
 	rootRef = createRef<HTMLDivElement>();
 
-	getDOMRegion() {
-		return Region.fromDOM(this.rootRef.current);
+	updateColor(_: PointType): ColorFormats.HSVA {
+		return {
+			h: 0,
+			s: 0,
+			v: 0,
+			a: 0,
+		};
 	}
 
-	getColors(hsv: ColorInput) {
-		if (typeof hsv === "string") {
-			throw new Error("color cannot be string");
-		}
-
+	getColors(hsv: ColorFormats.HSVA) {
 		const { inPicker } = this.props;
 
 		const first = inPicker ? hsv : toStringValue(hsv);
 
-		const args: ColorInput[] = [first];
+		const args: (string | ColorFormats.HSVA)[] = [first];
 
 		if (!inPicker) {
 			args.push({
@@ -100,55 +91,82 @@ export class BaseComponent<AdditionalProps> extends Component<
 		return args;
 	}
 
-	onMouseDown = (event: MouseEvent) => {
+	onMouseDown = (event: ReactMouseEvent) => {
 		event.preventDefault();
 
-		const region = this.getDOMRegion();
-		const info = getEventInfo(event, region);
+		const rootNode = this.rootRef.current;
 
-		DragHelper(event, {
-			scope: this,
-			constrainTo: region,
+		if (!rootNode) {
+			throw new Error("root ref is not provided");
+		}
 
-			/* eslint-disable no-param-reassign */
-			onDragStart(dragStartEvent, config) {
-				config.initialPoint = info;
+		const rect = rootNode.getBoundingClientRect();
+		const info = getEventInfo([event.clientX, event.clientY], rect);
 
-				config.minLeft = 0;
-				config.maxLeft = region.width;
-			},
-			/* eslint-enable no-param-reassign */
+		const config: ConfigType = {
+			initialPoint: info,
+			minLeft: 0,
+			maxLeft: rect.width,
+		};
 
-			onDrag(dragEvent, config) {
-				const dragInfo = getEventInfo(dragEvent, region);
-				const newHsv = this.updateColor(dragInfo);
+		const onMouseMove = (dragEvent: MouseEvent) => {
+			const dragInfo = getEventInfo(
+				[dragEvent.clientX, dragEvent.clientY],
+				rect,
+			);
+			const newHsv = this.updateColor(dragInfo);
 
-				this.handleDrag(dragEvent, config, newHsv);
-			},
+			this.handleDrag(config, newHsv);
+		};
 
-			onDrop(dropEvent, config) {
-				const dropInfo = getEventInfo(dropEvent, region);
-				const newHsv = this.updateColor(dropInfo);
+		const onTouchMove = (event: TouchEvent) => {
+			const firstTouch = event.touches[0];
 
-				this.handleDrop(dropEvent, config, newHsv);
-			},
-		});
+			if (!firstTouch) {
+				return;
+			}
+
+			const dragInfo = getEventInfo(
+				[firstTouch.clientX, firstTouch.clientY],
+				rect,
+			);
+			const newHsv = this.updateColor(dragInfo);
+
+			this.handleDrag(config, newHsv);
+		};
+
+		rootNode.addEventListener("mousemove", onMouseMove);
+		rootNode.addEventListener("touchmove", onTouchMove);
+
+		const onEnd = () => {
+			rootNode.removeEventListener("mousemove", onMouseMove);
+			rootNode.removeEventListener("touchmove", onTouchMove);
+			rootNode.removeEventListener("mouseup", onEnd);
+			rootNode.removeEventListener("touchend", onEnd);
+		};
+
+		rootNode.addEventListener("mouseup", onEnd);
+		rootNode.addEventListener("touchend", onEnd);
 
 		this.updateColor(info);
-		this.handleMouseDown(event, { initialPoint: info });
+		this.handleMouseDown(config);
 	};
 
-	handleMouseDown = (event: MouseEvent, config: ConfigType) => {
+	handleMouseDown = (config: ConfigType) => {
 		const { onMouseDown } = this.props;
+
+		if (!this.hsv) {
+			throw new Error("HSV is not setted");
+		}
 
 		if (onMouseDown) {
 			onMouseDown(...this.getColors(this.hsv));
 		}
 
-		this.handleDrag(event, config, this.hsv);
+		this.handleDrag(config, this.hsv);
 	};
 
-	handleUpdate(event: MouseEvent, config: ConfigType) {
+	handleUpdate(config: ConfigType) {
 		const diff = config.diff || { top: 0, left: 0 };
 		const { initialPoint } = config;
 
@@ -174,20 +192,20 @@ export class BaseComponent<AdditionalProps> extends Component<
 		}
 	}
 
-	handleDrag(event: MouseEvent, config: ConfigType, hsv: ColorInput) {
+	handleDrag(config: ConfigType, hsv: ColorFormats.HSVA) {
 		const { onDrag } = this.props;
 
-		this.handleUpdate(event, config);
+		this.handleUpdate(config);
 
 		if (onDrag) {
 			onDrag(...this.getColors(hsv));
 		}
 	}
 
-	handleDrop(event: MouseEvent, config: ConfigType, hsv: ColorInput) {
+	handleDrop(config: ConfigType, hsv: ColorFormats.HSVA) {
 		const { onChange } = this.props;
 
-		this.handleUpdate(event, config);
+		this.handleUpdate(config);
 
 		this.setState({
 			mouseDown: null,

@@ -1,3 +1,8 @@
-export { ColorPicker } from "./ColorPicker";
-export { HueSpectrum } from "./HueSpectrum";
-export { SaturationSpectrum } from "./SaturationSpectrum";
+import "../style/index.css";
+
+export { ColorPicker, type ColorPickerProps } from "./ColorPicker";
+export { HueSpectrum, type HueSpectrumProps } from "./HueSpectrum";
+export {
+	SaturationSpectrum,
+	type SaturationSpectrumProps,
+} from "./SaturationSpectrum";

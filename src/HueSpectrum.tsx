@@ -1,22 +1,25 @@
 import type { CSSProperties } from "react";
 import type { ColorFormats } from "tinycolor2";
 
+import { DEFAULT_COLOR } from "./defaultColor";
+import type { PointType } from "./types";
 import {
 	BaseComponent,
-	baseInitialState,
 	baseDefaultProps,
+	baseInitialState,
 } from "./utils/common";
-import { DEFAULT_COLOR } from "./defaultColor";
-import { validate } from "./utils/validate";
 import { toColorValue } from "./utils/toColorValue";
+import { validate } from "./utils/validate";
 
-type HueSpectrumProps = {
+const POINTER_SIZE = 3;
+
+export type HueSpectrumProps = {
 	value?: string | ColorFormats.HSVA;
 	height?: number;
 	width?: number;
 	pointerSize?: number;
 	defaultColor?: string | ColorFormats.HSVA;
-	isHueSpectrum?: boolean;
+	style?: CSSProperties;
 };
 
 export class HueSpectrum extends BaseComponent<HueSpectrumProps> {
@@ -26,9 +29,8 @@ export class HueSpectrum extends BaseComponent<HueSpectrumProps> {
 		value: null,
 		height: 300,
 		width: 30,
-		pointerSize: 3,
+		pointerSize: POINTER_SIZE,
 		defaultColor: DEFAULT_COLOR,
-		isHueSpectrum: true,
 	};
 
 	state = {
@@ -54,14 +56,24 @@ export class HueSpectrum extends BaseComponent<HueSpectrumProps> {
 	}
 
 	getDragPosition() {
-		const { height, pointerSize } = this.props;
+		const { height, pointerSize = POINTER_SIZE } = this.props;
 
 		if (!height && !this.isComponentMounted()) {
 			return null;
 		}
 
-		const computedHeight = height || this.getDOMRegion().getHeight();
+		const computedHeight =
+			height || this.rootRef.current?.getBoundingClientRect().height;
+
+		if (typeof computedHeight !== "number") {
+			throw new Error("cannot determine the height");
+		}
+
 		const size = pointerSize;
+
+		if (!this.hsv) {
+			throw new Error("HSV is not setted");
+		}
 
 		const pos = Math.round((this.hsv.h * computedHeight) / 360);
 		const diff = Math.round(size / 2);
@@ -69,8 +81,12 @@ export class HueSpectrum extends BaseComponent<HueSpectrumProps> {
 		return pos - diff;
 	}
 
-	updateColor(point) {
+	updateColor(point: PointType) {
 		const newPoint = validate(point);
+
+		if (!this.hsv) {
+			throw new Error("HSV is not setted");
+		}
 
 		this.hsv.h = (newPoint.y * 360) / newPoint.height;
 
@@ -78,7 +94,7 @@ export class HueSpectrum extends BaseComponent<HueSpectrumProps> {
 			...this.hsv,
 		};
 
-		let newH;
+		let newH: number;
 
 		if (this.hsv.h !== 0) {
 			newH = this.hsv.h;
@@ -96,8 +112,14 @@ export class HueSpectrum extends BaseComponent<HueSpectrumProps> {
 	}
 
 	render() {
-		const { style, value, defaultColor, pointerSize, height, width } =
-			this.props;
+		const {
+			style,
+			value,
+			defaultColor,
+			pointerSize = POINTER_SIZE,
+			height,
+			width,
+		} = this.props;
 
 		const { h } = this.state;
 

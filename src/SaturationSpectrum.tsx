@@ -1,20 +1,23 @@
+import cx from "classnames";
 import { CSSProperties } from "react";
 import type { ColorFormats } from "tinycolor2";
-import cx from "classnames";
+
+import { DEFAULT_COLOR } from "./defaultColor";
+import type { PointType } from "./types";
 import { fromRatio } from "./utils/color";
 import {
 	BaseComponent,
-	baseInitialState,
+	type BaseProps,
 	baseDefaultProps,
 } from "./utils/common";
-import { DEFAULT_COLOR } from "./defaultColor";
-
-import { validate } from "./utils/validate";
 import { toColorValue } from "./utils/toColorValue";
+import { validate } from "./utils/validate";
 
-const getSaturationForPoint = (point) => point.x / point.width;
+const DEFAULT_POINTER_SIZE = 7;
 
-const getColorValueForPoint = (point) =>
+const getSaturationForPoint = (point: PointType) => point.x / point.width;
+
+const getColorValueForPoint = (point: PointType) =>
 	(point.height - point.y) / point.height;
 
 const prepareBackgroundColor = (color: ColorFormats.HSVA) => {
@@ -29,13 +32,15 @@ const prepareBackgroundColor = (color: ColorFormats.HSVA) => {
 	return col.toRgbString();
 };
 
-type SaturationSpectrumProps = {
+export type SaturationSpectrumProps = {
+	className?: string;
+	color?: string | ColorFormats.HSVA;
 	value?: string | ColorFormats.HSVA;
 	height?: number;
 	width?: number;
 	pointerSize?: number;
 	defaultColor?: string | ColorFormats.HSVA;
-	isSaturationSpectrum?: boolean;
+	style?: CSSProperties;
 };
 
 export class SaturationSpectrum extends BaseComponent<SaturationSpectrumProps> {
@@ -45,18 +50,12 @@ export class SaturationSpectrum extends BaseComponent<SaturationSpectrumProps> {
 		value: null,
 		height: 300,
 		width: 300,
-		pointerSize: 7,
+		pointerSize: DEFAULT_POINTER_SIZE,
 		defaultColor: DEFAULT_COLOR,
 		isSaturationSpectrum: true,
 	};
 
 	mounted = false;
-
-	state = {
-		...baseInitialState,
-		pointerTop: null,
-		pointerLeft: null,
-	};
 
 	componentDidMount() {
 		this.mounted = true;
@@ -74,22 +73,34 @@ export class SaturationSpectrum extends BaseComponent<SaturationSpectrumProps> {
 	}
 
 	getDragPosition() {
-		const { value, pointerSize } = this.props;
+		const { value, pointerSize = DEFAULT_POINTER_SIZE } = this.props;
 		let { width, height } = this.props;
 		const { mouseDown } = this.state;
 
-		const sizeDefined = width && height;
+		const sizeDefined = typeof width === "number" && typeof height === "number";
 
 		if (!sizeDefined && !this.isComponentMounted()) {
 			return null;
 		}
 
-		let region;
-
 		if (!sizeDefined) {
-			region = this.getDOMRegion();
-			height = height || region.getHeight();
-			width = width || region.getWidth();
+			const rootNode = this.rootRef.current;
+
+			if (!rootNode) {
+				throw new Error("root ref is not provided");
+			}
+
+			const rect = rootNode.getBoundingClientRect();
+			height = height || rect.height;
+			width = width || rect.width;
+		}
+
+		if (!this.hsv) {
+			throw new Error("HSV is not setted");
+		}
+
+		if (typeof width !== "number" || typeof height !== "number") {
+			throw new Error("size is not defined");
 		}
 
 		let x = this.hsv.s * width;
@@ -108,12 +119,12 @@ export class SaturationSpectrum extends BaseComponent<SaturationSpectrumProps> {
 		};
 	}
 
-	prepareProps(thisProps) {
-		const props = {
+	prepareProps(thisProps: BaseProps & SaturationSpectrumProps) {
+		const props: BaseProps & SaturationSpectrumProps = {
 			...thisProps,
 		};
 
-		const color = props.value || props.defaultColor;
+		const color = props.value || props.defaultColor || DEFAULT_COLOR;
 
 		props.color = color;
 
@@ -128,7 +139,7 @@ export class SaturationSpectrum extends BaseComponent<SaturationSpectrumProps> {
 		return props;
 	}
 
-	prepareStyle(props) {
+	prepareStyle(props: BaseProps & SaturationSpectrumProps) {
 		const style = {
 			...props.style,
 		};
@@ -141,13 +152,17 @@ export class SaturationSpectrum extends BaseComponent<SaturationSpectrumProps> {
 			style.width = props.width;
 		}
 
+		if (!this.hsv) {
+			throw new Error("HSV is not setted");
+		}
+
 		style.backgroundColor = prepareBackgroundColor(this.hsv);
 
 		return style;
 	}
 
 	render() {
-		const { pointerSize } = this.props;
+		const { pointerSize = DEFAULT_POINTER_SIZE } = this.props;
 		const props = this.prepareProps(this.props);
 
 		const dragStyle: CSSProperties = {
@@ -182,8 +197,12 @@ export class SaturationSpectrum extends BaseComponent<SaturationSpectrumProps> {
 		);
 	}
 
-	updateColor(point) {
+	updateColor(point: PointType) {
 		const newPoint = validate(point);
+
+		if (!this.hsv) {
+			throw new Error("HSV is not setted");
+		}
 
 		this.hsv.s = getSaturationForPoint(newPoint);
 		this.hsv.v = getColorValueForPoint(newPoint);

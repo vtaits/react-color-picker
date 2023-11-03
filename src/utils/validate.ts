@@ -1,23 +1,23 @@
-/* eslint-disable no-param-reassign */
+import type { PointType } from "../types";
 
-export function validate(point) {
-	const { height, width } = info;
+export function validate(point: PointType) {
+	const { height, width } = point;
 
-	if (info.x < 0) {
-		info.x = 0;
+	if (point.x < 0) {
+		point.x = 0;
 	}
 
-	if (info.x >= width) {
-		info.x = width;
+	if (point.x >= width) {
+		point.x = width;
 	}
 
-	if (info.y < 0) {
-		info.y = 0;
+	if (point.y < 0) {
+		point.y = 0;
 	}
 
-	if (info.y >= height) {
-		info.y = height;
+	if (point.y >= height) {
+		point.y = height;
 	}
 
-	return info;
+	return point;
 }
