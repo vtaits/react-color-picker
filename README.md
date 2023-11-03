@@ -1,4 +1,5 @@
 [![NPM](https://img.shields.io/npm/v/@vtaits/react-color-picker.svg)](https://www.npmjs.com/package/@vtaits/react-color-picker)
+![dependencies status](https://img.shields.io/librariesio/release/npm/@vtaits/react-color-picker)
 
 # React Color Picker
 
@@ -30,14 +31,13 @@ $ yarn add @vtaits/react-color-picker
 
 #### Please don't forget to include the styles!!! - `index.css`
 
-```jsx
-import { render } from 'react-dom';
-import React, { useState } from 'react';
-import ColorPicker from '@vtaits/react-color-picker';
+```tsx
+import { useState } from 'react';
+import { ColorPicker } from '@vtaits/react-color-picker';
 
 import '@vtaits/react-color-picker/dist/index.css';
 
-const App = () => {
+function App() {
   const [color, setColor] = useState('red');
 
   const onDrag = (color) => {
@@ -58,17 +58,14 @@ const App = () => {
       </div>
     </div>
   );
-};
-
-render(<App />, document.getElementById('content'))
+}
 ```
 
 ## HueSpectrum
 
 You can use only the hue spectrum if that is what you need.
 
-```jsx
-import React from 'react';
+```tsx
 import { HueSpectrum } from '@vtaits/react-color-picker';
 
 <HueSpectrum value={color} width={100}/>
@@ -78,8 +75,7 @@ import { HueSpectrum } from '@vtaits/react-color-picker';
 
 You can use only the saturation spectrum if that is what you need.
 
-```jsx
-import React from 'react';
+```tsx
 import { SaturationSpectrum } from '@vtaits/react-color-picker';
 
 <SaturationSpectrum value={color} height={400}/>
@@ -96,7 +92,7 @@ Available options:
  * hueWidth
  * hueHeight (defaults to saturationHeight)
 
-```jsx
+```tsx
 <ColorPicker value={color} saturationWidth={400} saturationHeight={500} />
 <ColorPicker value={color} saturationWidth={400} saturationHeight={500} hueWidth={100}/>
 ```
