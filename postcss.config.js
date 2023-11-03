@@ -1,7 +1,7 @@
-const precss = require('precss');
+const atImport = require("postcss-import")
 
 module.exports = {
   plugins: [
-    precss(),
+    atImport(),
   ],
 };
