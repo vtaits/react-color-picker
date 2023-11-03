@@ -157,6 +157,7 @@ export class HueSpectrum extends BaseComponent<HueSpectrumProps> {
 				className="react-color-picker__hue-spectrum"
 				style={rootStyle}
 				onMouseDown={this.onMouseDown}
+				onTouchStart={this.onTouchStart}
 				role="button"
 				ref={this.rootRef}
 				tabIndex={0}

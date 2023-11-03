@@ -2,6 +2,7 @@
 import {
 	Component,
 	type MouseEvent as ReactMouseEvent,
+	type TouchEvent as ReactTouchEvent,
 	createRef,
 } from "react";
 import type { ColorFormats, ColorInput } from "tinycolor2";
@@ -91,9 +92,7 @@ export class BaseComponent<AdditionalProps> extends Component<
 		return args;
 	}
 
-	onMouseDown = (event: ReactMouseEvent) => {
-		event.preventDefault();
-
+	onStartMove = (clientX: number, clientY: number) => {
 		const rootNode = this.rootRef.current;
 
 		if (!rootNode) {
@@ -101,7 +100,7 @@ export class BaseComponent<AdditionalProps> extends Component<
 		}
 
 		const rect = rootNode.getBoundingClientRect();
-		const info = getEventInfo([event.clientX, event.clientY], rect);
+		const info = getEventInfo([clientX, clientY], rect);
 
 		const config: ConfigType = {
 			initialPoint: info,
@@ -116,10 +115,20 @@ export class BaseComponent<AdditionalProps> extends Component<
 			);
 			const newHsv = this.updateColor(dragInfo);
 
-			this.handleDrag(config, newHsv);
+			this.handleDrag(
+				{
+					...config,
+					diff: {
+						left: dragInfo.x - info.x,
+						top: dragInfo.y - info.y,
+					},
+				},
+				newHsv,
+			);
 		};
 
 		const onTouchMove = (event: TouchEvent) => {
+			event.preventDefault();
 			const firstTouch = event.touches[0];
 
 			if (!firstTouch) {
@@ -132,24 +141,50 @@ export class BaseComponent<AdditionalProps> extends Component<
 			);
 			const newHsv = this.updateColor(dragInfo);
 
-			this.handleDrag(config, newHsv);
+			this.handleDrag(
+				{
+					...config,
+					diff: {
+						left: dragInfo.x - info.x,
+						top: dragInfo.y - info.y,
+					},
+				},
+				newHsv,
+			);
 		};
 
-		rootNode.addEventListener("mousemove", onMouseMove);
-		rootNode.addEventListener("touchmove", onTouchMove);
+		document.addEventListener("mousemove", onMouseMove);
+		document.addEventListener("touchmove", onTouchMove);
 
 		const onEnd = () => {
-			rootNode.removeEventListener("mousemove", onMouseMove);
-			rootNode.removeEventListener("touchmove", onTouchMove);
-			rootNode.removeEventListener("mouseup", onEnd);
-			rootNode.removeEventListener("touchend", onEnd);
+			document.removeEventListener("mousemove", onMouseMove);
+			document.removeEventListener("touchmove", onTouchMove);
+			document.removeEventListener("mouseup", onEnd);
+			document.removeEventListener("touchend", onEnd);
 		};
 
-		rootNode.addEventListener("mouseup", onEnd);
-		rootNode.addEventListener("touchend", onEnd);
+		document.addEventListener("mouseup", onEnd);
+		document.addEventListener("touchend", onEnd);
 
 		this.updateColor(info);
 		this.handleMouseDown(config);
+	};
+
+	onMouseDown = (event: ReactMouseEvent) => {
+		event.preventDefault();
+		this.onStartMove(event.clientX, event.clientY);
+	};
+
+	onTouchStart = (event: ReactTouchEvent) => {
+		event.preventDefault();
+
+		const firstTouch = event.touches[0];
+
+		if (!firstTouch) {
+			return;
+		}
+
+		this.onStartMove(firstTouch.clientX, firstTouch.clientY);
 	};
 
 	handleMouseDown = (config: ConfigType) => {

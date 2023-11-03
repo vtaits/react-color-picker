@@ -183,6 +183,7 @@ export class SaturationSpectrum extends BaseComponent<SaturationSpectrumProps> {
 				className={props.className}
 				style={props.style}
 				onMouseDown={this.onMouseDown}
+				onTouchStart={this.onTouchStart}
 				role="button"
 				ref={this.rootRef}
 				tabIndex={0}

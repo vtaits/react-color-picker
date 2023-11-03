@@ -67,6 +67,11 @@
     "react": "^16.3.0 || ^17.0.0 || ^18.0.0",
     "react-dom": "^16.3.0 || ^17.0.0 || ^18.0.0"
   },
+  "resolutions": {
+    "string-width": "^4",
+    "jackspeak": "^2",
+    "strip-ansi": "^6"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/vtaits/react-color-picker.git"
