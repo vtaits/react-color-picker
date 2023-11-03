@@ -3,11 +3,11 @@ import React, {
   useState,
 } from 'react';
 
-import ColorPicker from '@vtaits/react-color-picker';
+import { ColorPicker, type ColorPickerProps } from '../src';
 
 const COLOR = 'red';
 
-export function App() {
+export function Example(props: ColorPickerProps) {
   const [color, setColor] = useState(COLOR);
 
   const onDrag = useCallback((nextColor) => {
@@ -16,9 +16,8 @@ export function App() {
 
   return (
     <div>
-      <h1>React Color Picker</h1>
-
       <ColorPicker
+        {...props}
         value={color}
         onDrag={onDrag}
       />
