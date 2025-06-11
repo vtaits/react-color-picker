@@ -35,7 +35,7 @@ $ yarn add @vtaits/react-color-picker
 import { useState } from 'react';
 import { ColorPicker } from '@vtaits/react-color-picker';
 
-import '@vtaits/react-color-picker/dist/index.css';
+import '@vtaits/react-color-picker/index.css';
 
 function App() {
   const [color, setColor] = useState('red');

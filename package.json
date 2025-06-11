@@ -7,22 +7,20 @@
     "dist"
   ],
   "main": "./dist/index.js",
-  "module": "./dist/esm/index.js",
+  "module": "./dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/esm/index.js",
-      "require": "./dist/index.js"
+      "import": "./dist/index.js"
     },
     "./index.css": {
-      "import": "./dist/esm/index.css",
-      "require": "./dist/index.css"
+      "import": "./dist/index.css"
     }
   },
   "scripts": {
     "start": "storybook dev -p 6006",
-    "build": "tsup src/index.ts --sourcemap --format esm,cjs --dts --legacy-output",
+    "build": "tsup src/index.ts --sourcemap --format esm --dts",
     "clean": "rm -rf dist",
     "prepare": "yarn clean && yarn build",
     "lint": "biome check src stories",
