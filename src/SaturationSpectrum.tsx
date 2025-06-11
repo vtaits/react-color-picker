@@ -1,5 +1,5 @@
 import cx from "classnames";
-import { CSSProperties } from "react";
+import type { CSSProperties } from "react";
 import type { ColorFormats } from "tinycolor2";
 
 import { DEFAULT_COLOR } from "./defaultColor";

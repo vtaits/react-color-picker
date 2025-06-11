@@ -41,18 +41,17 @@ type StateType = {
 };
 
 export class ColorPicker extends Component<ColorPickerProps, StateType> {
-	// eslint-disable-next-line react/static-property-placement
-	static defaultProps = {
+	static defaultProps: ColorPickerProps = {
 		className: "",
 		hueStyle: {},
 
-		onDrag: Function.prototype,
-		onChange: Function.prototype,
+		onDrag: () => {},
+		onChange: () => {},
 
-		value: null,
+		value: undefined,
 		defaultColor: DEFAULT_COLOR,
 
-		hueHeight: null,
+		hueHeight: undefined,
 		hueMargin: 10,
 		hueWidth: 30,
 
@@ -189,11 +188,12 @@ export class ColorPicker extends Component<ColorPickerProps, StateType> {
 
 				switch (childElement.type) {
 					case SaturationSpectrum:
-						saturationSpectrumProps = childElement.props;
+						saturationSpectrumProps =
+							childElement.props as SaturationSpectrumProps;
 						break;
 
 					case HueSpectrum:
-						hueSpectrumProps = childElement.props;
+						hueSpectrumProps = childElement.props as HueSpectrumProps;
 						break;
 
 					default:

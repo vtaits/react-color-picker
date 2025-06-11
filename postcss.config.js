@@ -1,6 +1,6 @@
-const atImport = require("postcss-import")
+import atImport from "postcss-import";
 
-module.exports = {
+export default {
   plugins: [
     atImport(),
   ],

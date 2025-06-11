@@ -1,37 +1,29 @@
-import React, {
-  useCallback,
-  useState,
-} from 'react';
+import { useCallback, useState } from "react";
+import { ColorPicker, type ColorPickerProps } from "../src";
 
-import { ColorPicker, type ColorPickerProps } from '../src';
-
-const COLOR = 'red';
+const COLOR = "red";
 
 export function Example(props: ColorPickerProps) {
-  const [color, setColor] = useState(COLOR);
+	const [color, setColor] = useState(COLOR);
 
-  const onDrag = useCallback((nextColor) => {
-    setColor(nextColor);
-  }, []);
+	const onDrag = useCallback((nextColor: string) => {
+		setColor(nextColor);
+	}, []);
 
-  return (
-    <div>
-      <ColorPicker
-        {...props}
-        value={color}
-        onDrag={onDrag}
-      />
+	return (
+		<div>
+			<ColorPicker {...props} value={color} onDrag={onDrag} />
 
-      <div
-        style={{
-          background: color,
-          width: 100,
-          height: 50,
-          color: 'white',
-        }}
-      >
-        {color}
-      </div>
-    </div>
-  );
+			<div
+				style={{
+					background: color,
+					width: 100,
+					height: 50,
+					color: "white",
+				}}
+			>
+				{color}
+			</div>
+		</div>
+	);
 }

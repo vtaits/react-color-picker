@@ -206,9 +206,7 @@ export class BaseComponent<AdditionalProps> extends Component<
 		const { initialPoint } = config;
 
 		if (initialPoint) {
-			let left;
-
-			left = initialPoint.x + diff.left;
+			let left = initialPoint.x + diff.left;
 			const top = initialPoint.y + diff.top;
 
 			left = Math.max(left, config.minLeft);
