@@ -1,9 +1,9 @@
 /* eslint-disable */
 import {
 	Component,
+	createRef,
 	type MouseEvent as ReactMouseEvent,
 	type TouchEvent as ReactTouchEvent,
-	createRef,
 } from "react";
 import type { ColorFormats, ColorInput } from "tinycolor2";
 

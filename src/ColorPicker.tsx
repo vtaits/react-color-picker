@@ -1,19 +1,18 @@
 import cx from "classnames";
 import {
-	type CSSProperties,
 	Children,
 	Component,
+	type CSSProperties,
 	type PropsWithChildren,
 	type ReactElement,
 } from "react";
 import type { ColorFormats, ColorInput } from "tinycolor2";
-
+import { DEFAULT_COLOR } from "./defaultColor";
 import { HueSpectrum, type HueSpectrumProps } from "./HueSpectrum";
 import {
 	SaturationSpectrum,
 	type SaturationSpectrumProps,
 } from "./SaturationSpectrum";
-import { DEFAULT_COLOR } from "./defaultColor";
 import type { BaseProps } from "./utils/common";
 import { toColorValue } from "./utils/toColorValue";
 import { toStringValue } from "./utils/toStringValue";
@@ -159,8 +158,8 @@ export class ColorPicker extends Component<ColorPickerProps, StateType> {
 			value: propsValue,
 			saturationHeight,
 			saturationWidth,
-			onChange,
-			onDrag,
+			onChange: _onChange,
+			onDrag: _onDrag,
 			...divProps
 		} = props;
 
