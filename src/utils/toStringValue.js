@@ -1,7 +1,14 @@
-import type { ColorInput } from "tinycolor2";
-import { toColor } from "./color";
+import { toColor } from "./color.js";
 
-export function toStringValue(color: ColorInput) {
+/**
+ * @import { ColorInput } from "tinycolor2"
+ */
+
+/**
+ * @param {ColorInput} color
+ * @returns {string}
+ */
+export function toStringValue(color) {
 	if (typeof color === "string") {
 		throw new Error("color cannot be string");
 	}

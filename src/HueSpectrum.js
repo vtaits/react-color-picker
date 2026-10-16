@@ -1,28 +1,35 @@
-import type { CSSProperties } from "react";
-import type { ColorFormats } from "tinycolor2";
-
-import { DEFAULT_COLOR } from "./defaultColor";
-import type { PointType } from "./types";
+import { jsx } from "react/jsx-runtime";
+import { DEFAULT_COLOR } from "./defaultColor.js";
 import {
 	BaseComponent,
 	baseDefaultProps,
 	baseInitialState,
-} from "./utils/common";
-import { toColorValue } from "./utils/toColorValue";
-import { validate } from "./utils/validate";
+} from "./utils/common.js";
+import { toColorValue } from "./utils/toColorValue.js";
+import { validate } from "./utils/validate.js";
+
+/**
+ * @import { CSSProperties } from "react"
+ * @import { ColorFormats } from "tinycolor2"
+ * @import { PointType } from "./types.js"
+ */
 
 const POINTER_SIZE = 3;
 
-export type HueSpectrumProps = {
-	value?: string | ColorFormats.HSVA;
-	height?: number;
-	width?: number;
-	pointerSize?: number;
-	defaultColor?: string | ColorFormats.HSVA;
-	style?: CSSProperties;
-};
+/**
+ * @typedef {Object} HueSpectrumProps
+ * @property {string | ColorFormats.HSVA} [value]
+ * @property {number} [height]
+ * @property {number} [width]
+ * @property {number} [pointerSize]
+ * @property {string | ColorFormats.HSVA} [defaultColor]
+ * @property {CSSProperties} [style]
+ */
 
-export class HueSpectrum extends BaseComponent<HueSpectrumProps> {
+/**
+ * @extends {BaseComponent<HueSpectrumProps>}
+ */
+export class HueSpectrum extends BaseComponent {
 	static defaultProps = {
 		...baseDefaultProps,
 
@@ -39,6 +46,9 @@ export class HueSpectrum extends BaseComponent<HueSpectrumProps> {
 	};
 
 	mounted = false;
+
+	/** @type {ColorFormats.HSVA | null} */
+	hsv = null;
 
 	isComponentMounted() {
 		return this.mounted;
@@ -81,7 +91,11 @@ export class HueSpectrum extends BaseComponent<HueSpectrumProps> {
 		return pos - diff;
 	}
 
-	updateColor(point: PointType) {
+	/**
+	 * @param {PointType} point
+	 * @returns
+	 */
+	updateColor(point) {
 		const newPoint = validate(point);
 
 		if (!this.hsv) {
@@ -94,7 +108,8 @@ export class HueSpectrum extends BaseComponent<HueSpectrumProps> {
 			...this.hsv,
 		};
 
-		let newH: number;
+		/** @type {number} */
+		let newH;
 
 		if (this.hsv.h !== 0) {
 			newH = this.hsv.h;
@@ -141,7 +156,8 @@ export class HueSpectrum extends BaseComponent<HueSpectrumProps> {
 			rootStyle.width = width;
 		}
 
-		const dragStyle: CSSProperties = {
+		/** @type {CSSProperties} */
+		const dragStyle = {
 			height: pointerSize,
 		};
 
@@ -152,20 +168,21 @@ export class HueSpectrum extends BaseComponent<HueSpectrumProps> {
 			dragStyle.display = "block";
 		}
 
-		return (
-			<div
-				className="react-color-picker__hue-spectrum"
-				style={rootStyle}
-				onMouseDown={this.onMouseDown}
-				onTouchStart={this.onTouchStart}
-				role="button"
-				ref={this.rootRef}
-				tabIndex={0}
-			>
-				<div className="react-color-picker__hue-drag" style={dragStyle}>
-					<div className="react-color-picker__hue-inner" />
-				</div>
-			</div>
-		);
+		return jsx("div", {
+			className: "react-color-picker__hue-spectrum",
+			style: rootStyle,
+			onMouseDown: this.onMouseDown,
+			onTouchStart: this.onTouchStart,
+			role: "button",
+			ref: this.rootRef,
+			tabIndex: 0,
+			children: jsx("div", {
+				className: "react-color-picker__hue-drag",
+				style: dragStyle,
+				children: jsx("div", {
+					className: "react-color-picker__hue-inner",
+				}),
+			}),
+		});
 	}
 }

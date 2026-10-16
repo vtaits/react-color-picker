@@ -1,6 +1,12 @@
-import type { PointType } from "../types";
+/**
+ * @import { PointType } from "../types.js";
+ */
 
-export function validate(point: PointType) {
+/**
+ * @param {PointType} point
+ * @returns {PointType}
+ */
+export function validate(point) {
 	const { height, width } = point;
 
 	if (point.x < 0) {

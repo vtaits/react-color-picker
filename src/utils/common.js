@@ -1,37 +1,37 @@
-/* eslint-disable */
-import {
-	Component,
-	createRef,
-	type MouseEvent as ReactMouseEvent,
-	type TouchEvent as ReactTouchEvent,
-} from "react";
-import type { ColorFormats, ColorInput } from "tinycolor2";
+import { Component, createRef } from "react";
+import { toStringValue } from "./toStringValue.js";
 
-import type { ConfigType, PointType } from "../types";
-import { toStringValue } from "./toStringValue";
+/**
+ * @import {MouseEvent as ReactMouseEvent, TouchEvent as ReactTouchEvent, RefObject} from "react"
+ * @import { ColorFormats, ColorInput } from "tinycolor2"
+ * @import { ConfigType, PointType } from "../types.js"
+ */
 
-type StateType = {
-	dragHue?: number;
-	h?: number;
-	top: number;
-	left: number;
-	mouseDown: PointType | null;
-	pointerTop?: number;
-	pointerLeft?: number;
-};
+/**
+ * @typedef {Object} StateType
+ * @property {number} [dragHue]
+ * @property {number} [h]
+ * @property {number} top
+ * @property {number} left
+ * @property {PointType | null} mouseDown
+ * @property {number} [pointerTop]
+ * @property {number} [pointerLeft]
+ */
 
-export const baseInitialState: StateType = {
+/** @type {StateType} */
+export const baseInitialState = {
 	top: 0,
 	left: 0,
 	mouseDown: null,
 };
 
-export type BaseProps = {
-	inPicker?: boolean;
-	onMouseDown?: (...colors: readonly (string | ColorFormats.HSVA)[]) => void;
-	onDrag?: (...colors: readonly (string | ColorFormats.HSVA)[]) => void;
-	onChange?: (...colors: readonly ColorInput[]) => void;
-};
+/**
+ * @typedef {Object} BaseProps
+ * @property {boolean} [inPicker]
+ * @property {(...colors: readonly (string | ColorFormats.HSVA)[]) => void} [onMouseDown]
+ * @property {(...colors: readonly (string | ColorFormats.HSVA)[]) => void} [onDrag]
+ * @property {(...colors: readonly ColorInput[]) => void} [onChange]
+ */
 
 export const baseDefaultProps = {
 	inPicker: false,
@@ -40,10 +40,13 @@ export const baseDefaultProps = {
 	onChange: undefined,
 };
 
-function getEventInfo(
-	[clientX, clientY]: [number, number],
-	region: DOMRect,
-): PointType {
+/**
+ *
+ * @param {[number, number]} coords
+ * @param {DOMRect} region
+ * @returns {PointType}
+ */
+function getEventInfo([clientX, clientY], region) {
 	const x = clientX - region.left;
 	const y = clientY - region.top;
 
@@ -55,19 +58,31 @@ function getEventInfo(
 	};
 }
 
-export class BaseComponent<AdditionalProps> extends Component<
+/**
+ * @template AdditionalProps
+ * @extends {Component<
 	BaseProps & AdditionalProps,
 	StateType
-> {
+	>}
+ */
+export class BaseComponent extends Component {
 	static defaultProps = baseDefaultProps;
 
-	hsv: ColorFormats.HSVA | null = null;
+	/** @type {ColorFormats.HSVA | null} */
+	hsv = null;
 
 	state = baseInitialState;
 
-	rootRef = createRef<HTMLDivElement>();
+	/**
+	 * @type {RefObject<HTMLDivElement | null>}
+	 */
+	rootRef = createRef();
 
-	updateColor(_: PointType): ColorFormats.HSVA {
+	/**
+	 * @param {PointType} _
+	 * @returns {ColorFormats.HSVA}
+	 */
+	updateColor(_) {
 		return {
 			h: 0,
 			s: 0,
@@ -76,12 +91,17 @@ export class BaseComponent<AdditionalProps> extends Component<
 		};
 	}
 
-	getColors(hsv: ColorFormats.HSVA) {
+	/**
+	 * @param {ColorFormats.HSVA} hsv
+	 * @returns {(string | ColorFormats.HSVA)[]}
+	 */
+	getColors(hsv) {
 		const { inPicker } = this.props;
 
 		const first = inPicker ? hsv : toStringValue(hsv);
 
-		const args: (string | ColorFormats.HSVA)[] = [first];
+		/** @type {(string | ColorFormats.HSVA)[]} */
+		const args = [first];
 
 		if (!inPicker) {
 			args.push({
@@ -92,7 +112,11 @@ export class BaseComponent<AdditionalProps> extends Component<
 		return args;
 	}
 
-	onStartMove = (clientX: number, clientY: number) => {
+	/**
+	 * @param {number} clientX
+	 * @param {number} clientY
+	 */
+	onStartMove = (clientX, clientY) => {
 		const rootNode = this.rootRef.current;
 
 		if (!rootNode) {
@@ -102,13 +126,17 @@ export class BaseComponent<AdditionalProps> extends Component<
 		const rect = rootNode.getBoundingClientRect();
 		const info = getEventInfo([clientX, clientY], rect);
 
-		const config: ConfigType = {
+		/** @type {ConfigType} */
+		const config = {
 			initialPoint: info,
 			minLeft: 0,
 			maxLeft: rect.width,
 		};
 
-		const onMouseMove = (dragEvent: MouseEvent) => {
+		/**
+		 * @param {MouseEvent} dragEvent
+		 */
+		const onMouseMove = (dragEvent) => {
 			const dragInfo = getEventInfo(
 				[dragEvent.clientX, dragEvent.clientY],
 				rect,
@@ -127,7 +155,10 @@ export class BaseComponent<AdditionalProps> extends Component<
 			);
 		};
 
-		const onTouchMove = (event: TouchEvent) => {
+		/**
+		 * @param {TouchEvent} event
+		 */
+		const onTouchMove = (event) => {
 			event.preventDefault();
 			const firstTouch = event.touches[0];
 
@@ -170,12 +201,18 @@ export class BaseComponent<AdditionalProps> extends Component<
 		this.handleMouseDown(config);
 	};
 
-	onMouseDown = (event: ReactMouseEvent) => {
+	/**
+	 * @param {ReactMouseEvent} event
+	 */
+	onMouseDown = (event) => {
 		event.preventDefault();
 		this.onStartMove(event.clientX, event.clientY);
 	};
 
-	onTouchStart = (event: ReactTouchEvent) => {
+	/**
+	 * @param {ReactTouchEvent} event
+	 */
+	onTouchStart = (event) => {
 		event.preventDefault();
 
 		const firstTouch = event.touches[0];
@@ -187,7 +224,10 @@ export class BaseComponent<AdditionalProps> extends Component<
 		this.onStartMove(firstTouch.clientX, firstTouch.clientY);
 	};
 
-	handleMouseDown = (config: ConfigType) => {
+	/**
+	 * @param {ConfigType} config
+	 */
+	handleMouseDown = (config) => {
 		const { onMouseDown } = this.props;
 
 		if (!this.hsv) {
@@ -201,7 +241,10 @@ export class BaseComponent<AdditionalProps> extends Component<
 		this.handleDrag(config, this.hsv);
 	};
 
-	handleUpdate(config: ConfigType) {
+	/**
+	 * @param {ConfigType} config
+	 */
+	handleUpdate(config) {
 		const diff = config.diff || { top: 0, left: 0 };
 		const { initialPoint } = config;
 
@@ -225,7 +268,11 @@ export class BaseComponent<AdditionalProps> extends Component<
 		}
 	}
 
-	handleDrag(config: ConfigType, hsv: ColorFormats.HSVA) {
+	/**
+	 * @param {ConfigType} config
+	 * @param {ColorFormats.HSVA} hsv
+	 */
+	handleDrag(config, hsv) {
 		const { onDrag } = this.props;
 
 		this.handleUpdate(config);
@@ -235,7 +282,11 @@ export class BaseComponent<AdditionalProps> extends Component<
 		}
 	}
 
-	handleDrop(config: ConfigType, hsv: ColorFormats.HSVA) {
+	/**
+	 * @param {ConfigType} config
+	 * @param {ColorFormats.HSVA} hsv
+	 */
+	handleDrop(config, hsv) {
 		const { onChange } = this.props;
 
 		this.handleUpdate(config);

@@ -1,26 +1,34 @@
-import cx from "classnames";
-import type { CSSProperties } from "react";
-import type { ColorFormats } from "tinycolor2";
+import { jsx, jsxs } from "react/jsx-runtime";
+import { DEFAULT_COLOR } from "./defaultColor.js";
+import { fromRatio } from "./utils/color.js";
+import { BaseComponent, baseDefaultProps } from "./utils/common.js";
+import { toColorValue } from "./utils/toColorValue.js";
+import { validate } from "./utils/validate.js";
 
-import { DEFAULT_COLOR } from "./defaultColor";
-import type { PointType } from "./types";
-import { fromRatio } from "./utils/color";
-import {
-	BaseComponent,
-	type BaseProps,
-	baseDefaultProps,
-} from "./utils/common";
-import { toColorValue } from "./utils/toColorValue";
-import { validate } from "./utils/validate";
+/**
+ * @import { CSSProperties } from "react"
+ * @import { ColorFormats } from "tinycolor2"
+ * @import { PointType } from "./types.js"
+ * @import { BaseProps } from "./utils/common.js"
+ */
 
 const DEFAULT_POINTER_SIZE = 7;
 
-const getSaturationForPoint = (point: PointType) => point.x / point.width;
+/**
+ * @param {PointType} point
+ */
+const getSaturationForPoint = (point) => point.x / point.width;
 
-const getColorValueForPoint = (point: PointType) =>
+/**
+ * @param {PointType} point
+ */
+const getColorValueForPoint = (point) =>
 	(point.height - point.y) / point.height;
 
-const prepareBackgroundColor = (color: ColorFormats.HSVA) => {
+/**
+ * @param {ColorFormats.HSVA} color
+ */
+const prepareBackgroundColor = (color) => {
 	const hsv = color;
 
 	const col = fromRatio({
@@ -32,18 +40,22 @@ const prepareBackgroundColor = (color: ColorFormats.HSVA) => {
 	return col.toRgbString();
 };
 
-export type SaturationSpectrumProps = {
-	className?: string;
-	color?: string | ColorFormats.HSVA;
-	value?: string | ColorFormats.HSVA;
-	height?: number;
-	width?: number;
-	pointerSize?: number;
-	defaultColor?: string | ColorFormats.HSVA;
-	style?: CSSProperties;
-};
+/**
+ * @typedef {Object} SaturationSpectrumProps
+ * @property {string} [className]
+ * @property {string | ColorFormats.HSVA} [color]
+ * @property {string | ColorFormats.HSVA} [value]
+ * @property {number} [height]
+ * @property {number} [width]
+ * @property {number} [pointerSize]
+ * @property {string | ColorFormats.HSVA} [defaultColor]
+ * @property {CSSProperties} [style]
+ */
 
-export class SaturationSpectrum extends BaseComponent<SaturationSpectrumProps> {
+/**
+ * @extends {BaseComponent<SaturationSpectrumProps>}
+ */
+export class SaturationSpectrum extends BaseComponent {
 	static defaultProps = {
 		...baseDefaultProps,
 
@@ -119,8 +131,12 @@ export class SaturationSpectrum extends BaseComponent<SaturationSpectrumProps> {
 		};
 	}
 
-	prepareProps(thisProps: BaseProps & SaturationSpectrumProps) {
-		const props: BaseProps & SaturationSpectrumProps = {
+	/**
+	 * @param {BaseProps & SaturationSpectrumProps} thisProps
+	 */
+	prepareProps(thisProps) {
+		/** @type {BaseProps & SaturationSpectrumProps} */
+		const props = {
 			...thisProps,
 		};
 
@@ -131,15 +147,15 @@ export class SaturationSpectrum extends BaseComponent<SaturationSpectrumProps> {
 		this.hsv = toColorValue(color);
 
 		props.style = this.prepareStyle(props);
-		props.className = cx(
-			thisProps.className,
-			"react-color-picker__saturation-spectrum",
-		);
+		props.className = `${thisProps.className ?? ""} react-color-picker__saturation-spectrum`;
 
 		return props;
 	}
 
-	prepareStyle(props: BaseProps & SaturationSpectrumProps) {
+	/**
+	 * @param {BaseProps & SaturationSpectrumProps} props
+	 */
+	prepareStyle(props) {
 		const style = {
 			...props.style,
 		};
@@ -165,7 +181,8 @@ export class SaturationSpectrum extends BaseComponent<SaturationSpectrumProps> {
 		const { pointerSize = DEFAULT_POINTER_SIZE } = this.props;
 		const props = this.prepareProps(this.props);
 
-		const dragStyle: CSSProperties = {
+		/** @type {CSSProperties} */
+		const dragStyle = {
 			width: pointerSize,
 			height: pointerSize,
 		};
@@ -178,27 +195,37 @@ export class SaturationSpectrum extends BaseComponent<SaturationSpectrumProps> {
 			dragStyle.display = "block";
 		}
 
-		return (
-			<div
-				className={props.className}
-				style={props.style}
-				onMouseDown={this.onMouseDown}
-				onTouchStart={this.onTouchStart}
-				role="button"
-				ref={this.rootRef}
-				tabIndex={0}
-			>
-				<div className="react-color-picker__saturation-white">
-					<div className="react-color-picker__saturation-black" />
-				</div>
-				<div className="react-color-picker__saturation-drag" style={dragStyle}>
-					<div className="react-color-picker__saturation-inner" />
-				</div>
-			</div>
-		);
+		return jsxs("div", {
+			className: props.className,
+			style: props.style,
+			onMouseDown: this.onMouseDown,
+			onTouchStart: this.onTouchStart,
+			role: "button",
+			ref: this.rootRef,
+			tabIndex: 0,
+			children: [
+				jsx("div", {
+					className: "react-color-picker__saturation-white",
+					children: jsx("div", {
+						className: "react-color-picker__saturation-black",
+					}),
+				}),
+
+				jsx("div", {
+					className: "react-color-picker__saturation-drag",
+					style: dragStyle,
+					children: jsx("div", {
+						className: "react-color-picker__saturation-inner",
+					}),
+				}),
+			],
+		});
 	}
 
-	updateColor(point: PointType) {
+	/**
+	 * @param {PointType} point
+	 */
+	updateColor(point) {
 		const newPoint = validate(point);
 
 		if (!this.hsv) {
